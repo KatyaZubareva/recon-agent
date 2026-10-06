@@ -54,7 +54,9 @@ def importer_dsn(_test_database) -> str:
     """Чистые таблицы перед каждым тестом."""
     dsn = _dsn(TEST_DB)
     with psycopg.connect(dsn) as conn:
-        conn.execute("TRUNCATE accounts, charges, payments, import_runs")
+        conn.execute(
+            "TRUNCATE accounts, charges, payments, import_runs, recon_runs, recon_discrepancies"
+        )
     return dsn
 
 
