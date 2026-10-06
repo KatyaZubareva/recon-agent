@@ -155,3 +155,24 @@ def test_report_is_saved_to_db_and_file(loaded, importer_dsn, reader_dsn, tmp_pa
         (report.run_id,),
     ) == [("missing_in_target", "charge-2"), ("totals_mismatch", None)]
     assert report.run_id in path.name and path.read_text().count("charge-2") >= 1
+
+
+def test_discrepancy_script_inject_and_restore(loaded, importer_dsn, reader_dsn):
+    import pg_discrepancies
+
+    pg_discrepancies.inject(importer_dsn)
+    pg_discrepancies.inject(importer_dsn)  # повтор безопасен
+    report = run_reconciliation("2026-08", loaded, reader_dsn)
+    assert kinds(report) == {
+        ("missing_in_target", "charge-2"),
+        ("amount_mismatch", "charge-3"),
+        ("totals_mismatch", None),
+    }
+
+    assert run_import(loaded, importer_dsn).status == "ok"  # то же, что делает restore
+    assert run_reconciliation("2026-08", loaded, reader_dsn).status == "ok"
+    assert [c["id"] for c in pg_discrepancies.status(importer_dsn)] == [
+        "charge-1",
+        "charge-2",
+        "charge-3",
+    ]
