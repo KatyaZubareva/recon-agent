@@ -1,0 +1,24 @@
+:root {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #1f2328;
+  background: #ffffff;
+}
+body { margin: 0; }
+main { max-width: 980px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 1.5rem; margin: 0 0 16px; }
+h2 { font-size: 1.15rem; margin: 28px 0 8px; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+input, button { font: inherit; padding: 6px 12px; }
+button { cursor: pointer; border: 1px solid #1f6feb; background: #1f6feb; color: #fff; border-radius: 6px; }
+button:disabled { opacity: 0.5; cursor: progress; }
+.hint, .muted { color: #656d76; font-size: 0.9em; }
+.running { color: #9a6700; }
+.box { padding: 10px 14px; border-radius: 6px; margin: 8px 0; }
+.box.ok { background: #dafbe1; border: 1px solid #4ac26b; }
+.box.error { background: #ffebe9; border: 1px solid #ff8182; }
+strong.ok { color: #1a7f37; }
+strong.discrepancies { color: #cf222e; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+th, td { border: 1px solid #d0d7de; padding: 6px 10px; text-align: left; vertical-align: top; }
+th { background: #f6f8fa; }
+td.num { text-align: right; white-space: nowrap; }
