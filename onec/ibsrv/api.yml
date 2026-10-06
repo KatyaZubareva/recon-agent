@@ -1,0 +1,19 @@
+# Рабочая фаза (сервис onec в compose.yaml).
+# Публикуется ТОЛЬКО HTTP-сервис ReconAPI (GET); ReconLoader не публикуется -> 404.
+# Формат раздела http подобран и проверен вручную для ibsrv 8.3.27.2342
+# (аналог <httpServices publishByDefault="false"> в default.vrd).
+server:
+  address: any
+  port: 8314
+database:
+  path: /onec/data/db
+infobase:
+  name: recon
+http:
+  - base: /
+    http-services:
+      publish-by-default: no
+      service:
+        - name: ReconAPI
+          root: recon
+          publish: yes

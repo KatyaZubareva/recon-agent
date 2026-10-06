@@ -1,0 +1,10 @@
+# Фаза ВОССТАНОВЛЕНИЯ (только внутри onec/scripts/restore-inside.sh).
+# Слушает только localhost внутри контейнера: снаружи загрузчик недоступен даже сейчас.
+# Публикуются все HTTP-сервисы, включая ReconLoader.
+server:
+  address: localhost
+  port: 8314
+database:
+  path: /onec/data/db
+infobase:
+  name: recon

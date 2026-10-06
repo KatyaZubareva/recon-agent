@@ -25,5 +25,38 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+  onec:
+    # Настоящая 1С (автономный сервер ibsrv). Профиль onec: обычный `docker compose up`
+    # её не трогает, т.к. для сборки нужен дистрибутив в onec-dist/. Восстановление: onec/restore.sh
+    profiles: ["onec"]
+    build:
+      context: ./onec
+      additional_contexts:
+        dist: ./onec-dist
+    image: recon-onec:8.3.27.2342
+    platform: linux/amd64
+    hostname: recon-onec
+    init: true
+    command: ["ibsrv", "--data=/onec/data", "-c", "/onec/ibsrv/api.yml"]
+    stop_grace_period: 10s
+    environment:
+      ONEC_ADMIN_USER: ${ONEC_ADMIN_USER:-}
+      ONEC_ADMIN_PASSWORD: ${ONEC_ADMIN_PASSWORD:-}
+      ONEC_USER: ${ONEC_USER:-}
+      ONEC_PASSWORD: ${ONEC_PASSWORD:-}
+    ports:
+      - "127.0.0.1:${ONEC_PORT:-8314}:8314"
+    volumes:
+      - onec-data:/onec/data
+      - ./onec/config:/onec/config:ro
+      - ./onec/ibsrv:/onec/ibsrv:ro
+      - ./onec/scripts:/onec/scripts:ro
+      - ./fixtures:/onec/fixtures:ro
+    healthcheck:
+      test: ["CMD", "curl", "-s", "-o", "/dev/null", "http://localhost:8314/hs/recon/accounts"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
 volumes:
   postgres-data:
+  onec-data:
