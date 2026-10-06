@@ -3,3 +3,5 @@
 __pycache__
 artifacts
 onec-dist
+frontend/node_modules
+frontend/dist

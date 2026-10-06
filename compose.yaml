@@ -25,6 +25,34 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+  app:
+    # Веб-страница + API сверки. Источник по умолчанию — настоящая 1С (сервис onec,
+    # профиль onec). Для разработки без 1С: APP_ONEC_BASE_URL=http://source-mock:8000
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    environment:
+      ONEC_BASE_URL: ${APP_ONEC_BASE_URL:-http://onec:8314/hs/recon}
+      ONEC_USER: ${ONEC_USER:-}
+      ONEC_PASSWORD: ${ONEC_PASSWORD:-}
+      ONEC_ACCOUNTS_PATH: ${ONEC_ACCOUNTS_PATH:-accounts}
+      ONEC_CHARGES_PATH: ${ONEC_CHARGES_PATH:-charges}
+      ONEC_PAYMENTS_PATH: ${ONEC_PAYMENTS_PATH:-payments}
+      RECON_IMPORTER_DSN: postgresql://importer:demo-importer-local@postgres:5432/reporting
+      RECON_READER_DSN: postgresql://agent_reader:demo-reader-local@postgres:5432/reporting
+    ports:
+      - "127.0.0.1:${APP_PORT:-8080}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      onec:
+        condition: service_healthy
+        required: false
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
   onec:
     # Настоящая 1С (автономный сервер ibsrv). Профиль onec: обычный `docker compose up`
     # её не трогает, т.к. для сборки нужен дистрибутив в onec-dist/. Восстановление: onec/restore.sh
