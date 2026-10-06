@@ -13,3 +13,21 @@
 exports/
 **/.playwright-cli/
 output/
+
+# 1С: лицензии, дистрибутивы, файловые базы — никогда не коммитим
+*.lic
+*.run
+*.deb
+*.rpm
+*.dmg
+*.pkg
+*.tar.gz
+*.tgz
+*.zip
+*.7z
+*.1CD
+*.1cd
+onec-dist/
+# локальное
+.DS_Store
+.claude/settings.local.json
