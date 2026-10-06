@@ -1,0 +1,66 @@
+{
+  "run_id": "198db2c2-f7df-4b60-a32e-9e0598c64dd4",
+  "period": "2026-08",
+  "status": "discrepancies",
+  "started_at": "2026-10-06T16:08:51+00:00",
+  "finished_at": "2026-10-06T16:08:51+00:00",
+  "source": {
+    "name": "1С (http://localhost:8314/hs/recon)",
+    "count": 3,
+    "amount_kopecks": 1140000
+  },
+  "target": {
+    "name": "PostgreSQL",
+    "count": 2,
+    "amount_kopecks": 1124050
+  },
+  "rules": [
+    "missing_in_target",
+    "missing_in_source",
+    "amount_mismatch",
+    "account_mismatch",
+    "totals_mismatch"
+  ],
+  "discrepancies": [
+    {
+      "type": "missing_in_target",
+      "record_id": "charge-2",
+      "source": {
+        "account_id": "acc-alice",
+        "period": "2026-08",
+        "amount_kopecks": 24950
+      },
+      "target": null,
+      "message": "нет в PostgreSQL"
+    },
+    {
+      "type": "amount_mismatch",
+      "record_id": "charge-3",
+      "source": {
+        "account_id": "acc-bob",
+        "period": "2026-08",
+        "amount_kopecks": 990000
+      },
+      "target": {
+        "account_id": "acc-bob",
+        "period": "2026-08",
+        "amount_kopecks": 999000
+      },
+      "message": "разница +9000 коп. (PostgreSQL − 1С)"
+    },
+    {
+      "type": "totals_mismatch",
+      "record_id": null,
+      "source": {
+        "count": 3,
+        "amount_kopecks": 1140000
+      },
+      "target": {
+        "count": 2,
+        "amount_kopecks": 1124050
+      },
+      "message": "итоги за 2026-08 не совпадают"
+    }
+  ],
+  "error": null
+}

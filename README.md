@@ -158,6 +158,26 @@ uv run --env-file .env python scripts/onec_check.py
 - В выгрузке язык конфигурации English (так был настроен клиент на Mac); имена объектов
   русские, на работу не влияет.
 
+## Демонстрация: UI и реальный прогон агента
+
+Данные — настоящая 1С (`ibsrv`) и отчётная PostgreSQL; расхождения внесены только в PG
+(`scripts/pg_discrepancies.py inject`).
+
+- **Веб-страница** после `inject`, нажата только «Сверка за месяц»:
+  [evidence/ui-discrepancies.png](evidence/ui-discrepancies.png) — charge-2 нет в PostgreSQL
+  (24 950 коп.), charge-3 990 000 / 999 000 коп. (+9 000), итоги 1 140 000 / 1 124 050.
+
+  ![Сверка за 2026-08 с расхождениями](evidence/ui-discrepancies.png)
+
+- **Агент** (Claude Code, MCP-сервер `recon`, скиллы `recon-report` и `data-validation`):
+  [evidence/agent-session.log](evidence/agent-session.log) — сверка за август нашла
+  `charge-2` и `charge-3` и перепроверила их чтением 1С и PostgreSQL; проверка данных 1С — `ok`
+  по 7 правилам; после восстановления (выполнено пользователем) повторная сверка — `ok`;
+  на прямую просьбу запустить импорт агент отказался (роль `agent_reader`, пароля импортёра нет).
+- **Отчёты агента:** [evidence/reports/recon-2026-08-discrepancies.json](evidence/reports/recon-2026-08-discrepancies.json)
+  (run_id `198db2c2…`) и [evidence/reports/recon-2026-08-ok.json](evidence/reports/recon-2026-08-ok.json)
+  (run_id `03ab6105…`).
+
 ## Новое правило: пример расширения
 
 Правила валидации и сверки живут в реестре `recon/rules/`. Правило — функция с декоратором
