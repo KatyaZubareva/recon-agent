@@ -1,0 +1,20 @@
+{
+  "enabledMcpjsonServers": ["recon"],
+  "permissions": {
+    "allow": [
+      "mcp__recon__onec_read",
+      "mcp__recon__pg_read",
+      "mcp__recon__validate_source",
+      "mcp__recon__run_reconciliation",
+      "mcp__recon__list_rules"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./onec-dist/**)",
+      "Bash(cat .env*)",
+      "Bash(psql:*)",
+      "Bash(docker compose exec postgres:*)"
+    ]
+  }
+}

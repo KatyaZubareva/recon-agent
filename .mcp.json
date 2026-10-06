@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "recon": {
+      "command": "uv",
+      "args": ["run", "--env-file", ".env.agent", "python", "-m", "recon.mcp_server"]
+    }
+  }
+}
