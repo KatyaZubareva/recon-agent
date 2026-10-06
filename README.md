@@ -134,6 +134,19 @@ cd frontend && npm ci && npm run build && npm run lint
    выполнена — результат неизвестен» с причиной. Вернуть: `docker compose --profile onec up -d --wait onec`,
    данные PG — `scripts/pg_discrepancies.py restore`.
 
+### Проверка воспроизводимости (06.10.2026)
+
+Чистый клон с GitHub в отдельной папке, отдельный Compose-проект и порты, по шагам этого README:
+`onec/restore.sh` (1 мин 8 с, все внутренние проверки зелёные) → `docker compose --profile onec
+up -d --build --wait` → preflight и `onec_check.py` — PASS → `pytest` — все тесты прошли, `ruff` —
+без замечаний → CLI: импорт дважды, сверка `ok`, `inject` → `charge-2` и `charge-3`, `restore` →
+`ok` → API: сверка `ok`, при остановленной 1С — `error`, после запуска — `ok` → MCP-сервер:
+5 инструментов, сверка `ok` → фронтенд: `npm ci`, `build`, `lint`.
+
+Найдено и исправлено: `python -m recon import` на свежей PostgreSQL до первого старта `app`
+падал без схемы — теперь импорт создаёт схему сам (`58d7dd3`). Временная потеря сети на хосте
+прерывала `--build`; после восстановления сети шаг повторён успешно.
+
 ## Данные и права
 
 ### Схема PostgreSQL ([db/schema.sql](db/schema.sql))
