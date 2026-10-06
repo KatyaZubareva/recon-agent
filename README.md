@@ -125,15 +125,13 @@ cp .env.example .env        # заполнить ONEC_PASSWORD и ONEC_ADMIN_PAS
 ### Проверки
 
 ```bash
-# preflight и эталон (uv на хосте не нужен — запуск в контейнере mock в сети Compose)
-set -a; . ./.env; set +a
-docker compose --profile onec run --rm --no-deps -v "$PWD/scripts:/app/scripts:ro" \
-  -e ONEC_BASE_URL=http://onec:8314/hs/recon -e ONEC_USER -e ONEC_PASSWORD \
-  source-mock uv run --no-dev python scripts/preflight.py --real
-docker compose --profile onec run --rm --no-deps -v "$PWD/scripts:/app/scripts:ro" \
-  -e ONEC_BASE_URL=http://onec:8314/hs/recon -e ONEC_USER -e ONEC_PASSWORD \
-  source-mock uv run --no-dev python scripts/onec_check.py
+uv run --env-file .env python scripts/preflight.py --real
+uv run --env-file .env python scripts/onec_check.py
 ```
+
+Без uv на хосте те же скрипты запускаются в контейнере mock из сети Compose:
+`docker compose --profile onec run --rm --no-deps -v "$PWD/scripts:/app/scripts:ro" -e ONEC_BASE_URL=http://onec:8314/hs/recon -e ONEC_USER -e ONEC_PASSWORD source-mock uv run --no-dev python scripts/onec_check.py`
+(переменные ONEC_* из `.env` должны быть экспортированы).
 
 Результат 06.10.2026: preflight — `PASS` (accounts 2, charges 4, payments 1);
 `onec_check.py` — `PASS`, все записи совпадают с фикстурами, август 2026: 3 начисления,
