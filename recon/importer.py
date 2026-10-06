@@ -7,7 +7,8 @@
 - Запись — upsert по id: повторный импорт не создаёт дублей и возвращает
   изменённые/удалённые в PG строки к состоянию источника.
 Каждая попытка фиксируется в import_runs (отдельной транзакцией, чтобы ошибка
-тоже осталась в журнале).
+тоже осталась в журнале). Схема создаётся идемпотентно перед импортом — импорт
+работает и на пустой БД, даже если приложение ещё не запускалось.
 """
 
 import uuid
@@ -17,7 +18,7 @@ from typing import Any
 import psycopg
 from psycopg.types.json import Jsonb
 
-from recon.db import connect
+from recon.db import apply_schema, connect
 from recon.rules import run_validation
 from recon.source import Dataset, SourceClient, SourceError
 
@@ -37,7 +38,12 @@ class ImportResult:
 
 def run_import(source: SourceClient, importer_dsn: str) -> ImportResult:
     result = ImportResult(run_id=str(uuid.uuid4()), status="running", source=source.base_url)
-    _journal_start(importer_dsn, result)
+    try:
+        apply_schema(importer_dsn)
+        _journal_start(importer_dsn, result)
+    except psycopg.Error as error:  # БД недоступна — даже журнал записать нельзя
+        result.status, result.error = "error", f"PostgreSQL: {type(error).__name__}: {error}"
+        return result
     try:
         dataset = source.fetch_all()
         problems = run_validation(dataset)

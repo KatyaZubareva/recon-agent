@@ -101,7 +101,7 @@ uv run --env-file .env python scripts/pg_discrepancies.py restore   # повто
 ```bash
 docker compose up -d --wait postgres    # тестам нужна PostgreSQL (отдельная база reporting_test)
 uv sync --frozen
-uv run pytest                           # 51 тест
+uv run pytest                           # 53 теста
 uv run ruff check .
 cd frontend && npm ci && npm run build && npm run lint
 ```

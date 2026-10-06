@@ -131,3 +131,27 @@ def test_agent_reader_can_read_but_not_write(importer_dsn, reader_dsn, dataset):
         conn.commit()
         with pytest.raises(psycopg.errors.InsufficientPrivilege):
             conn.execute("UPDATE charges SET amount_kopecks = 0")
+
+
+def test_import_into_empty_database_creates_schema(dataset):
+    # Воспроизводимость: импорт по README на свежей PG, до первого старта приложения.
+    from conftest import ADMIN_DSN, _dsn
+
+    with psycopg.connect(ADMIN_DSN, autocommit=True) as conn:
+        conn.execute("DROP DATABASE IF EXISTS reporting_empty WITH (FORCE)")
+        conn.execute("CREATE DATABASE reporting_empty")
+    dsn = _dsn("reporting_empty")
+    try:
+        result = run_import(make_source(serving(dataset)), dsn)
+        assert result.status == "ok"
+        assert query(dsn, "SELECT status FROM import_runs") == [("ok",)]
+    finally:
+        with psycopg.connect(ADMIN_DSN, autocommit=True) as conn:
+            conn.execute("DROP DATABASE IF EXISTS reporting_empty WITH (FORCE)")
+
+
+def test_unreachable_database_is_error_not_traceback(dataset):
+    bad = "postgresql://importer:wrong@localhost:5543/reporting_test"
+    result = run_import(make_source(serving(dataset)), bad)
+    assert result.status == "error"
+    assert result.error.startswith("PostgreSQL:")
