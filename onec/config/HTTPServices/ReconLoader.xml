@@ -11,7 +11,7 @@
 			</Synonym>
 			<Comment/>
 			<RootURL>recon-load</RootURL>
-			<ReuseSessions>AutoUse</ReuseSessions>
+			<ReuseSessions>DontUse</ReuseSessions>
 			<SessionMaxAge>20</SessionMaxAge>
 		</Properties>
 		<ChildObjects>
