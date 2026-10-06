@@ -1,0 +1,46 @@
+{
+  "accounts": [
+    {
+      "id": "acc-alice",
+      "account_number": "10001"
+    },
+    {
+      "id": "acc-bob",
+      "account_number": "20002"
+    }
+  ],
+  "charges": [
+    {
+      "id": "charge-1",
+      "account_id": "acc-alice",
+      "period": "2026-08",
+      "amount_kopecks": 125050
+    },
+    {
+      "id": "charge-2",
+      "account_id": "acc-alice",
+      "period": "2026-08",
+      "amount_kopecks": 24950
+    },
+    {
+      "id": "charge-3",
+      "account_id": "acc-bob",
+      "period": "2026-08",
+      "amount_kopecks": 990000
+    },
+    {
+      "id": "charge-4",
+      "account_id": "acc-alice",
+      "period": "2026-09",
+      "amount_kopecks": 5000
+    }
+  ],
+  "payments": [
+    {
+      "id": "payment-1",
+      "account_id": "acc-alice",
+      "date": "2026-08-20",
+      "amount_kopecks": 100000
+    }
+  ]
+}
