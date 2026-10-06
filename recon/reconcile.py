@@ -53,7 +53,7 @@ def run_reconciliation(period: str, source: SourceClient, reader_dsn: str) -> Re
     except psycopg.Error as error:
         return _fail(report, f"PostgreSQL: {type(error).__name__}: {error}")
 
-    report.source = _side(f"1С ({source.base_url})", source_charges)
+    report.source = _side(f"Источник ({source.base_url})", source_charges)
     report.target = _side("PostgreSQL", target_charges)
     context = ReconContext(period, source_charges, target_charges)
     report.rules, found = run_reconcile_rules(context)

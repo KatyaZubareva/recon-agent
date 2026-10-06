@@ -33,6 +33,7 @@ def test_same_data_reports_no_discrepancies_with_totals(loaded, reader_dsn):
     assert report.source["count"] == report.target["count"] == 3
     assert report.source["amount_kopecks"] == report.target["amount_kopecks"] == 1140000
     assert "totals_mismatch" in report.rules
+    assert report.source["name"] == "Источник (http://source.test)"
 
 
 def test_deleted_and_changed_charge_are_found_with_ids(loaded, importer_dsn, reader_dsn):
