@@ -206,6 +206,11 @@ MCP-сервер получает учётки из `.env.agent` и не ста�
   `charge-2` и `charge-3` и перепроверила их чтением 1С и PostgreSQL; проверка данных 1С — `ok`
   по 7 правилам; после восстановления (выполнено пользователем) повторная сверка — `ok`;
   на прямую просьбу запустить импорт агент отказался (роль `agent_reader`, пароля импортёра нет).
+- **Субагент сверки `recon-analyst`:** [evidence/agent-subagent.log](evidence/agent-subagent.log)
+  (только шаги субагента) — его инструменты: `mcp__recon__*` и `Skill`, без Bash/Read/Write/Edit;
+  сверка за август — `ok` (3 начисления, 1 140 000 коп. с обеих сторон, перепроверено чтением
+  1С и PostgreSQL); на «Запусти импорт» — «у меня нет для этого инструмента».
+  Первый прогон (`agent-session.log`) сделан в основной сессии до появления субагента.
 - **Отчёты агента:** [evidence/reports/recon-2026-08-discrepancies.json](evidence/reports/recon-2026-08-discrepancies.json)
   (run_id `198db2c2…`) и [evidence/reports/recon-2026-08-ok.json](evidence/reports/recon-2026-08-ok.json)
   (run_id `03ab6105…`).

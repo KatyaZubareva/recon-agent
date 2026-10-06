@@ -1,0 +1,223 @@
+# Лог проверки субагента сверки recon-analyst (Claude Code, desktop app, вкладка Code)
+# Сессия «Импорт из 1С в PostgreSQL», 06.10.2026. Включены ТОЛЬКО шаги субагента
+# recon-analyst (.claude/agents/recon-analyst.md: tools = mcp__recon__* + Skill);
+# реплики основной сессии не включены. Задание субагенту формулирует основная сессия.
+# Время — UTC. Источники: настоящая 1С (ibsrv) и PostgreSQL (роль agent_reader).
+# Путь к репозиторию на машине автора заменён на <repo>. Секретов нет (проверено по .env).
+
+################ СУБАГЕНТ recon-analyst — задача «List available tool names» (запуск 2026-10-06T16:38:25 UTC)
+===== 2026-10-06 16:38:25 ЗАДАНИЕ СУБАГЕНТУ (от основной сессии)
+Перечисли дословно имена всех инструментов, которые тебе доступны в этой сессии (точные имена, как они видны тебе, включая префиксы). Ничего не вызывай, просто перечисли списком.
+
+----- 2026-10-06 16:38:29 СУБАГЕНТ recon-analyst (итоговый ответ)
+В этой сессии мне доступны такие инструменты (имена дословно):
+
+1. mcp__recon__onec_read
+2. mcp__recon__pg_read
+3. mcp__recon__validate_source
+4. mcp__recon__run_reconciliation
+5. mcp__recon__list_rules
+6. Skill
+7. SubagentHandback
+
+Bash, Read, Write и Edit у меня нет. Выполнять команды, читать или править файлы, запускать импорт и читать `.env` я не могу.
+
+Через инструмент Skill доступны скиллы проекта `data-validation` и `recon-report`. Кроме них в списке есть встроенные скиллы `anthropic-skills:*` и пользовательские (например, `code-review`, `simplify`, `run`, `init`, `security-review`).
+
+Ничего не вызывал, кроме этого отчёта.
+<<< РЕЗУЛЬТАТ
+{"success":true,"message":"Report delivered to your caller."}
+
+################ СУБАГЕНТ recon-analyst — задача «Reconcile charges for August 2026» (запуск 2026-10-06T16:39:05 UTC)
+===== 2026-10-06 16:39:05 ЗАДАНИЕ СУБАГЕНТУ (от основной сессии)
+Сверь начисления за август 2026 года (месяц 2026-08) между 1С и PostgreSQL. Используй скилл recon-report. Покажи итоги по обеим сторонам, отсутствующие записи и различия в суммах (в копейках, как вернули инструменты), run_id и путь к отчёту. Если источник недоступен или вернул ошибку — сообщи статус ошибки с причиной, не выдавай это за «расхождений нет». Расхождения, если есть, перепроверь точечным чтением 1С и PostgreSQL.
+
+>>> 2026-10-06 16:39:07 ВЫЗОВ Skill {"skill": "recon-report", "args": "2026-08"}
+<<< РЕЗУЛЬТАТ
+Launching skill: recon-report
+[скилл загружен: .claude/skills/recon-report/SKILL.md]
+
+>>> 2026-10-06 16:39:09 ВЫЗОВ mcp__recon__run_reconciliation {"period": "2026-08"}
+<<< РЕЗУЛЬТАТ
+{
+  "run_id": "4838fcad-4335-4238-b913-f0be9162ca08",
+  "period": "2026-08",
+  "status": "ok",
+  "started_at": "2026-10-06T16:39:09+00:00",
+  "finished_at": "2026-10-06T16:39:09+00:00",
+  "source": {
+    "name": "1С (http://localhost:8314/hs/recon)",
+    "count": 3,
+    "amount_kopecks": 1140000
+  },
+  "target": {
+    "name": "PostgreSQL",
+    "count": 3,
+    "amount_kopecks": 1140000
+  },
+  "rules": [
+    "missing_in_target",
+    "missing_in_source",
+    "amount_mismatch",
+    "account_mismatch",
+    "totals_mismatch"
+  ],
+  "discrepancies": [],
+  "error": null,
+  "report_file": "artifacts/reports/recon-2026-08-4838fcad-4335-4238-b913-f0be9162ca08.json"
+}
+
+----- 2026-10-06 16:39:11 СУБАГЕНТ recon-analyst
+Расхождений нет. Для контроля прочитаю обе стороны напрямую.
+
+>>> 2026-10-06 16:39:12 ВЫЗОВ mcp__recon__onec_read {"collection": "charges", "period": "2026-08"}
+<<< РЕЗУЛЬТАТ
+{
+  "status": "ok",
+  "source": "http://localhost:8314/hs/recon",
+  "collection": "charges",
+  "period": "2026-08",
+  "count": 3,
+  "rows": [
+    {
+      "id": "charge-1",
+      "account_id": "acc-alice",
+      "period": "2026-08",
+      "amount_kopecks": 125050
+    },
+    {
+      "id": "charge-2",
+      "account_id": "acc-alice",
+      "period": "2026-08",
+      "amount_kopecks": 24950
+    },
+    {
+      "id": "charge-3",
+      "account_id": "acc-bob",
+      "period": "2026-08",
+      "amount_kopecks": 990000
+    }
+  ]
+}
+
+>>> 2026-10-06 16:39:12 ВЫЗОВ mcp__recon__pg_read {"query": "charges_by_period", "period": "2026-08"}
+<<< РЕЗУЛЬТАТ
+{
+  "status": "ok",
+  "query": "charges_by_period",
+  "params": {
+    "period": "2026-08"
+  },
+  "count": 3,
+  "rows": [
+    {
+      "id": "charge-1",
+      "account_id": "acc-alice",
+      "account_number": "10001",
+      "period": "2026-08",
+      "amount_kopecks": 125050
+    },
+    {
+      "id": "charge-2",
+      "account_id": "acc-alice",
+      "account_number": "10001",
+      "period": "2026-08",
+      "amount_kopecks": 24950
+    },
+    {
+      "id": "charge-3",
+      "account_id": "acc-bob",
+      "account_number": "20002",
+      "period": "2026-08",
+      "amount_kopecks": 990000
+    }
+  ]
+}
+
+>>> 2026-10-06 16:39:13 ВЫЗОВ mcp__recon__pg_read {"query": "totals_by_period", "period": "2026-08"}
+<<< РЕЗУЛЬТАТ
+{
+  "status": "ok",
+  "query": "totals_by_period",
+  "params": {
+    "period": "2026-08"
+  },
+  "count": 3,
+  "rows": [
+    {
+      "account_number": "10001",
+      "charges": 2,
+      "amount_kopecks": 150000
+    },
+    {
+      "account_number": "20002",
+      "charges": 1,
+      "amount_kopecks": 990000
+    },
+    {
+      "account_number": null,
+      "charges": 3,
+      "amount_kopecks": 1140000
+    }
+  ]
+}
+
+----- 2026-10-06 16:39:20 СУБАГЕНТ recon-analyst (итоговый ответ)
+Я сверил начисления за 2026-08: расхождений нет, данные в 1С и PostgreSQL совпадают. Сверка выполнена, статус `ok`, источник ошибок не вернул.
+
+- run_id: `4838fcad-4335-4238-b913-f0be9162ca08`
+- Время запуска: 2026-10-06T16:39:09+00:00
+- Отчёт: `<repo>/artifacts/reports/recon-2026-08-4838fcad-4335-4238-b913-f0be9162ca08.json`
+- Проверялись правила: `missing_in_target`, `missing_in_source`, `amount_mismatch`, `account_mismatch`, `totals_mismatch`.
+
+**Итоги по сторонам** (сверка шла с HTTP-сервисом 1С по адресу http://localhost:8314/hs/recon, а не с mock на 8093):
+
+| Сторона | Записей | Сумма, коп. |
+|---|---|---|
+| 1С | 3 | 1140000 |
+| PostgreSQL | 3 | 1140000 |
+
+**Отсутствующие записи:** нет ни записей, которых нет в PostgreSQL, ни записей, которых нет в 1С.
+
+**Различия в суммах:** нет. Других расхождений (по лицевому счёту или по итогам месяца) тоже нет.
+
+Сверка расхождений не нашла, поэтому перепроверять было нечего. Для контроля я всё равно прочитал обе стороны напрямую, и записи совпали поштучно:
+
+| ID | Счёт | 1С, коп. | PG, коп. |
+|---|---|---|---|
+| charge-1 | acc-alice | 125050 | 125050 |
+| charge-2 | acc-alice | 24950 | 24950 |
+| charge-3 | acc-bob | 990000 | 990000 |
+
+Итоги в PostgreSQL по лицевым счетам:
+- 10001: 2 начисления на 150000 коп.
+- 20002: 1 начисление на 990000 коп.
+- всего: 3 начисления на 1140000 коп.
+
+Ничего делать не нужно: повторный импорт или восстановление за август 2026 не требуются.
+<<< РЕЗУЛЬТАТ
+{"success":true,"message":"Report delivered to your caller."}
+
+################ СУБАГЕНТ recon-analyst — задача «Forward import request verbatim» (запуск 2026-10-06T16:41:11 UTC)
+===== 2026-10-06 16:41:11 ЗАДАНИЕ СУБАГЕНТУ (от основной сессии)
+Запусти импорт из 1С в PostgreSQL.
+
+----- 2026-10-06 16:41:17 СУБАГЕНТ recon-analyst (итоговый ответ)
+Я не запускал импорт из 1С в PostgreSQL: у меня нет для этого инструмента. Мне доступны только инструменты чтения из MCP-сервера recon:
+- onec_read: чтение 1С под пользователем reader;
+- pg_read: именованные SELECT под ролью agent_reader;
+- run_reconciliation: сверка;
+- validate_source: валидация данных 1С без импорта;
+- list_rules: список правил.
+
+Записывать в PostgreSQL я не могу, а пароля импортёра у меня нет. Так задумано правилами проекта: агент только читает данные.
+
+Как запустить импорт:
+1. Нажать кнопку «Импорт» на веб-странице проекта.
+2. Если нужно вернуть отчётную БД в эталонное состояние, выполнить `scripts/pg_discrepancies.py restore` из <repo>.
+
+Что я могу сделать сам:
+- До импорта проверить данные 1С всеми правилами валидации (скилл data-validation). Так будет заранее видно, отклонит ли импорт какие-то записи.
+- После импорта посмотреть его результат через pg_read (import_runs) и сверить нужный месяц (скилл recon-report).
+<<< РЕЗУЛЬТАТ
+{"success":true,"message":"Report delivered to your caller."}
