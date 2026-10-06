@@ -158,6 +158,38 @@ uv run --env-file .env python scripts/onec_check.py
 - В выгрузке язык конфигурации English (так был настроен клиент на Mac); имена объектов
   русские, на работу не влияет.
 
+## Агент сверки (Claude Code)
+
+Агент сверки — субагент `recon-analyst` ([.claude/agents/recon-analyst.md](.claude/agents/recon-analyst.md)),
+у него только инструменты `mcp__recon__*` (без Bash/Edit/Write), поэтому прочитать `.env` или
+запустить импорт он не может.
+
+| Инструмент MCP-сервера `recon` | Что делает |
+|---|---|
+| `onec_read` | чтение 1С (пользователь reader), можно ограничить месяцем |
+| `pg_read` | 8 именованных параметризованных SELECT от `agent_reader`; произвольного SQL нет |
+| `validate_source` | правила валидации по данным 1С, без импорта |
+| `run_reconciliation` | та же сверка, что у страницы; отчёт в `artifacts/reports/` |
+| `list_rules` | список правил |
+
+Скиллы: [data-validation](.claude/skills/data-validation/SKILL.md) и
+[recon-report](.claude/skills/recon-report/SKILL.md).
+
+Запуск:
+
+```bash
+docker compose --profile onec up -d --wait postgres onec   # источники
+python3 scripts/make_agent_env.py                           # .env.agent: только read-only ключи
+```
+
+1. Открыть Claude Code в корне репозитория (CLI `claude` или вкладка Code в приложении) и
+   подтвердить MCP-сервер `recon` из `.mcp.json`.
+2. Обратиться к субагенту: `@recon-analyst сверь начисления за август 2026 года между 1С и
+   PostgreSQL. Покажи отсутствующие записи и различия в суммах.`
+
+MCP-сервер получает учётки из `.env.agent` и не стартует, если в окружении есть ключ
+импортёра PostgreSQL или администратора 1С.
+
 ## Демонстрация: UI и реальный прогон агента
 
 Данные — настоящая 1С (`ibsrv`) и отчётная PostgreSQL; расхождения внесены только в PG
